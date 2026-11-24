@@ -55,6 +55,17 @@ anks_fx(TripleDrive Tdri "ANKS Triple Drive" Distortion FALSE)
 anks_fx(Tracker     Fx13 "ANKS Tracker"      Generator  TRUE)
 anks_fx(Filter      Fx14 "ANKS Filter"       Filter     FALSE)
 
+# Vague 2 : chaînes et déformations
+anks_fx(DoubleFilter  Fx15 "ANKS Double Filter"     Filter     FALSE)
+anks_fx(TripleFold    Fx16 "ANKS Triple Fold"       Distortion FALSE)
+anks_fx(MultibandDrive Fx17 "ANKS Multiband Drive"  Distortion FALSE)
+anks_fx(Sandwich      Fx18 "ANKS Sandwich"          Distortion FALSE)
+anks_fx(CrushDrive    Fx19 "ANKS Crush Drive"       Distortion FALSE)
+anks_fx(SatChain      Fx20 "ANKS Saturation Chain"  Distortion FALSE)
+anks_fx(OctaveFuzz    Fx21 "ANKS Octave Fuzz"       Distortion FALSE)
+anks_fx(FeedbackDrive Fx22 "ANKS Feedback Drive"    Distortion FALSE)
+anks_fx(Exciter       Fx23 "ANKS Exciter"           Distortion FALSE)
+
 message(STATUS "ANKS FX : ${ANKS_ALL_TARGETS}")
 
 # Tests hors ligne (optionnels, non compilés par GitHub Actions)

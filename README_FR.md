@@ -1,6 +1,6 @@
 # ANKS FX — suite d'effets ANKS Labs
 
-14 petits effets audio VST3 pour Ableton Live (Lite compris), gratuits et open source.
+23 petits effets audio VST3 pour Ableton Live (Lite compris), gratuits et open source.
 Pas de fenêtre à ouvrir : **tous les réglages apparaissent directement dans le rack d'Ableton** (moins de 64 paramètres par effet, donc Live les affiche tout seul). La petite plaque du plug-in n'existe que parce que le format VST3 l'exige.
 
 ## Les effets
@@ -22,6 +22,22 @@ Pas de fenêtre à ouvrir : **tous les réglages apparaissent directement dans l
 | **ANKS Tracker** | Le niveau de la boucle joue un oscillateur : sub sous le kick (Follow) ou notes déclenchées (Trigger, Random Notes). | Kicks, batteries |
 | **ANKS Filter** | Filtre LP/BP/HP/Notch avec LFO et suiveur d'enveloppe. | Tout |
 
+### Vague 2 — chaînes et déformations
+
+| Effet | Ce qu'il fait | Boucles conseillées |
+|---|---|---|
+| **ANKS Double Filter** | Deux filtres multimodes en série ou en parallèle, chacun avec LFO et enveloppe. | Tout |
+| **ANKS Triple Fold** | Trois wavefolders en série (suréchantillonnage x4), symétrie et tonalité par étage. | Synthés, basses |
+| **ANKS Multiband Drive** | Graves / médiums / aigus distordus séparément (6 types), bande « Clean » possible. | Batteries, basses |
+| **ANKS Sandwich** | Drive > filtre résonant (enveloppe, LFO) > Drive : résonance saturée, très acid. | Basses, lignes 303 |
+| **ANKS Crush Drive** | Drive > bitcrush > Drive, modulé par LFO. | Batteries |
+| **ANKS Saturation Chain** | Lampe > bande > transistor, Auto Gain et Tilt. | Tout, en finition |
+| **ANKS Octave Fuzz** | Fuzz à redresseur : octave au-dessus, sub carré en dessous, gate qui crachote. | Basses, guitares |
+| **ANKS Feedback Drive** | Distorsion renvoyée dans elle-même par un délai court : larsen, sifflements. Duck calme le jeu. | Tout (attention au volume) |
+| **ANKS Exciter** | Sature seulement les aigus et les ajoute ; Air et Low Warmth. | Voix, hi-hats, mix |
+
+Types de distorsion communs : Soft, Hard, Fold, Tube, Tape, Transistor.
+
 Commun à tous : **Dry/Wet**, **Output**, **Bypass**. La plupart ont un **LFO** (Rate, Sync calé sur le tempo de Live, Shape dont S&H et Smooth Rnd) et une destination « LFO > … ».
 Quand Live joue, le LFO et les effets rythmiques (Gate, Stutter) sont verrouillés sur la grille ; à l'arrêt, ils tournent au tempo de Live.
 
@@ -30,7 +46,7 @@ Ces trois effets acceptent le MIDI. Sur une piste MIDI, choisir « MIDI To » �
 
 ## Compiler
 
-Le workflow GitHub Actions compile les 14 effets à chaque push sur `main` (ou à la main depuis l'onglet Actions). Résultat : un seul téléchargement **ANKS-FX-VST3-Windows** contenant tous les `.vst3`. Si un effet échoue, les autres sont quand même livrés.
+Le workflow GitHub Actions compile les 23 effets à chaque push sur `main` (ou à la main depuis l'onglet Actions). Résultat : un seul téléchargement **ANKS-FX-VST3-Windows** contenant tous les `.vst3`. Si un effet échoue, les autres sont quand même livrés.
 
 ## Installer
 

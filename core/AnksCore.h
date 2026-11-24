@@ -213,6 +213,76 @@ inline float oscWave (int wave, float ph, float dt)
 inline const juce::StringArray& waveNames() { static const juce::StringArray n { "Sine", "Triangle", "Saw", "Square" }; return n; }
 
 //==============================================================================
+// Distorsions partagées par la suite
+inline const juce::StringArray& driveNames()
+{
+    static const juce::StringArray n { "Soft", "Hard", "Fold", "Tube", "Tape", "Transistor" };
+    return n;
+}
+/** Applique une saturation (entrée déjà amplifiée). */
+inline float shape (int type, float x)
+{
+    switch (type)
+    {
+        case 1:  return juce::jlimit (-1.0f, 1.0f, x);
+        case 2:  { x = juce::jlimit (-1.0e5f, 1.0e5f, x); return (2.0f / pi) * std::asin (std::sin (x * pi * 0.5f)); }
+        case 3:  return x >= 0.0f ? std::tanh (x) : std::tanh (x * 0.6f) / 0.6f * 0.7f;     // asymétrique : harmoniques paires
+        case 4:  return (2.0f / pi) * std::atan (x * pi * 0.5f);
+        case 5:  { x = juce::jlimit (-1.5f, 1.5f, x); return x - (4.0f / 27.0f) * x * x * x; }
+        default: return std::tanh (x);
+    }
+}
+
+/** Suréchantillonnage x2 / x4 autour d'un traitement par échantillon. */
+class Oversampler
+{
+public:
+    void prepare (int maxBlock, int factorLog2)
+    {
+        os = std::make_unique<juce::dsp::Oversampling<float>> (2, (size_t) factorLog2,
+                juce::dsp::Oversampling<float>::filterHalfBandPolyphaseIIR, true, true);
+        os->initProcessing ((size_t) maxBlock); os->reset();
+        factor = 1 << factorLog2;
+    }
+    int latency() const { return os ? juce::roundToInt (os->getLatencyInSamples()) : 0; }
+    int getFactor() const { return factor; }
+    void reset() { if (os) os->reset(); }
+    template <typename Fn>
+    void process (juce::AudioBuffer<float>& b, int start, int count, int numCh, Fn&& fn)
+    {
+        juce::dsp::AudioBlock<float> whole (b);
+        auto block = whole.getSubsetChannelBlock (0, (size_t) numCh).getSubBlock ((size_t) start, (size_t) count);
+        auto up = os->processSamplesUp (block);
+        fn (up);
+        os->processSamplesDown (block);
+    }
+private:
+    std::unique_ptr<juce::dsp::Oversampling<float>> os;
+    int factor = 1;
+};
+
+/** Suiveur d'enveloppe (attaque / relâchement). */
+struct EnvFollower
+{
+    float env = 0.0f, aC = 1.0f, rC = 1.0f;
+    void set (float attackMs, float releaseMs, double sr)
+    {
+        aC = 1.0f - std::exp (-1.0f / (juce::jmax (0.05f, attackMs) * 0.001f * (float) sr));
+        rC = 1.0f - std::exp (-1.0f / (juce::jmax (0.05f, releaseMs) * 0.001f * (float) sr));
+    }
+    float process (float level) { env += (level > env ? aC : rC) * (level - env); return env; }
+};
+
+/** Filtre multimode (LP, BP, HP, Notch) basé sur le SVF. */
+inline const juce::StringArray& filterNames() { static const juce::StringArray n { "Low Pass", "Band Pass", "High Pass", "Notch" }; return n; }
+inline float resoToQ (float percent) { return 0.5f * std::pow (40.0f, juce::jlimit (0.0f, 100.0f, percent) * 0.01f); }
+inline float filterOut (Svf& f, int type, float x)
+{
+    float lp, bp, hp; f.tick (x, lp, bp, hp);
+    switch (type) { case 1: return bp * f.k; case 2: return hp; case 3: return lp + hp; default: return lp; }
+}
+
+//==============================================================================
 /** LFO commun : libre en Hz ou calé sur le tempo (phase verrouillée sur la grille quand Live joue). */
 class Lfo
 {

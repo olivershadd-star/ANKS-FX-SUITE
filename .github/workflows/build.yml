@@ -18,7 +18,7 @@ jobs:
       - name: Compiler chaque effet (un échec n'arrête pas les autres)
         shell: pwsh
         run: |
-          $targets = "Ring","Shaper","Shift","Gate","Formant","PhaseMod","Resonator","Grain","Stutter","Tape","Crush","TripleDrive","Tracker","Filter"
+          $targets = "Ring","Shaper","Shift","Gate","Formant","PhaseMod","Resonator","Grain","Stutter","Tape","Crush","TripleDrive","Tracker","Filter","DoubleFilter","TripleFold","MultibandDrive","Sandwich","CrushDrive","SatChain","OctaveFuzz","FeedbackDrive","Exciter"
           $failed = @()
           foreach ($t in $targets) {
             Write-Host "=== $t ==="
