@@ -1,0 +1,48 @@
+name: Build ANKS FX (VST3 Windows)
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build-windows:
+    runs-on: windows-2022
+    steps:
+      - name: Télécharger le projet
+        uses: actions/checkout@v4
+
+      - name: Préparer la compilation Windows 64 bits
+        run: cmake -S . -B build -G "Visual Studio 17 2022" -A x64
+
+      - name: Compiler chaque effet (un échec n'arrête pas les autres)
+        shell: pwsh
+        run: |
+          $targets = "Ring","Shaper","Shift","Gate","Formant","PhaseMod","Resonator","Grain","Stutter","Tape","Crush","TripleDrive","Tracker","Filter"
+          $failed = @()
+          foreach ($t in $targets) {
+            Write-Host "=== $t ==="
+            cmake --build build --config Release --target "${t}_VST3" --parallel
+            if ($LASTEXITCODE -ne 0) { $failed += $t }
+          }
+          New-Item -ItemType Directory -Force -Path dist/ANKS-FX | Out-Null
+          Get-ChildItem -Path build -Recurse -Directory -Filter *.vst3 |
+            Where-Object { $_.FullName -match '\\Release\\VST3\\' } |
+            ForEach-Object { Copy-Item $_.FullName -Destination dist/ANKS-FX -Recurse -Force }
+          Copy-Item README_FR.md dist/ANKS-FX/ -Force
+          Write-Host "Effets compilés :"; Get-ChildItem dist/ANKS-FX
+          if ($failed.Count -gt 0) { Write-Host "ECHEC : $($failed -join ', ')"; "FAILED=$($failed -join ',')" >> $env:GITHUB_ENV }
+          exit 0
+
+      - name: Préparer le téléchargement
+        uses: actions/upload-artifact@v4
+        with:
+          name: ANKS-FX-VST3-Windows
+          path: dist/
+          if-no-files-found: error
+
+      - name: Signaler les effets en échec
+        if: env.FAILED != ''
+        run: |
+          echo "Effets non compilés : $env:FAILED"
+          exit 1
