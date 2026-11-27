@@ -5,12 +5,29 @@ on:
     branches: [ main ]
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   build-windows:
     runs-on: windows-2022
     steps:
       - name: Télécharger le projet
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Lire le numéro de version
+        id: version
+        shell: pwsh
+        run: |
+          $match = Select-String -Path CMakeLists.txt -Pattern 'project\([A-Za-z0-9_]+ VERSION ([0-9.]+)'
+          $version = $match.Matches[0].Groups[1].Value
+          $exists = git tag --list "v$version"
+          $publish = (-not $exists) -and ('${{ github.event_name }}' -ne 'pull_request') -and ('${{ github.ref }}' -eq 'refs/heads/main')
+          "version=$version" >> $env:GITHUB_OUTPUT
+          "publish=$($publish.ToString().ToLower())" >> $env:GITHUB_OUTPUT
+          Write-Host "Version $version - publication : $publish"
 
       - name: Préparer la compilation Windows 64 bits
         run: cmake -S . -B build -G "Visual Studio 17 2022" -A x64
@@ -46,3 +63,31 @@ jobs:
         run: |
           echo "Effets non compilés : $env:FAILED"
           exit 1
+
+      - name: Préparer le ZIP numéroté
+        if: steps.version.outputs.publish == 'true'
+        shell: pwsh
+        run: |
+          $name = "ANKS-FX-Windows-x64-${{ steps.version.outputs.version }}"
+          New-Item -ItemType Directory -Force release | Out-Null
+          Copy-Item -Recurse dist/ANKS-FX "release/$name"
+          Copy-Item LICENSE "release/$name/"
+          Compress-Archive -Path "release/$name" -DestinationPath "release/$name.zip" -Force
+
+      - name: Publier la version (onglet Releases)
+        if: steps.version.outputs.publish == 'true'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ steps.version.outputs.version }}
+          target_commitish: ${{ github.sha }}
+          name: ANKS FX ${{ steps.version.outputs.version }}
+          prerelease: true
+          files: release/*.zip
+          body: |
+            **ANKS FX — 23 petits effets audio VST3, ANKS Labs, gratuits.** Version de test.
+
+            1. Télécharge `ANKS-FX-Windows-x64-${{ steps.version.outputs.version }}.zip` ci-dessous (rubrique *Assets*) et fais clic droit → **Extraire tout**.
+            2. Ferme Live, copie les dossiers `.vst3` dans `C:\Program Files\Common Files\VST3`.
+            3. Dans Live : **Préférences → Plug-ins → Dossier système VST3 = On**, puis **Relancer l'analyse**. Les effets apparaissent sous **Plug-ins → ANKS Labs**.
+
+            **EN —** Download `ANKS-FX-Windows-x64-${{ steps.version.outputs.version }}.zip`, extract it and copy the `.vst3` folders to `C:\Program Files\Common Files\VST3`, then rescan plug-ins.

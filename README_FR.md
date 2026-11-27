@@ -3,6 +3,19 @@
 23 petits effets audio VST3 pour Ableton Live (Lite compris), gratuits et open source.
 Pas de fenêtre à ouvrir : **tous les réglages apparaissent directement dans le rack d'Ableton** (moins de 64 paramètres par effet, donc Live les affiche tout seul). La petite plaque du plug-in n'existe que parce que le format VST3 l'exige.
 
+## ⬇ TÉLÉCHARGER ET INSTALLER — DOWNLOAD
+
+[![TÉLÉCHARGER LA DERNIÈRE VERSION](https://img.shields.io/github/v/release/olivershadd-star/ANKS-FX-SUITE?include_prereleases&sort=date&display_name=tag&style=for-the-badge&logo=github&logoColor=F7FAFF&label=T%C3%89L%C3%89CHARGER&labelColor=10151E&color=EF343E)](../../releases/latest) [![TOUTES LES VERSIONS](https://img.shields.io/badge/TOUTES_LES-VERSIONS-F5C343?style=for-the-badge&labelColor=10151E)](../../releases)
+
+1. Clique sur **TÉLÉCHARGER**, puis, dans la rubrique *Assets*, télécharge `ANKS-FX-Windows-x64-X.Y.Z.zip` (X.Y.Z = numéro de version : prends toujours le plus grand).
+2. Clic droit sur le ZIP → **Extraire tout**.
+3. Ferme Live et copie les dossiers `.vst3` dans `C:\Program Files\Common Files\VST3`.
+4. Dans Live : **Préférences → Plug-ins → Dossier système VST3 = On**, puis **Relancer l'analyse**. Les effets apparaissent sous **Plug-ins → ANKS Labs**.
+
+**EN —** Click **DOWNLOAD**, get `ANKS-FX-Windows-x64-X.Y.Z.zip` from *Assets*, extract it and copy the `.vst3` folders to `C:\Program Files\Common Files\VST3`, then rescan plug-ins.
+
+---
+
 ## Les effets
 
 | Effet | Ce qu'il fait | Boucles conseillées |
@@ -46,7 +59,7 @@ Ces trois effets acceptent le MIDI. Sur une piste MIDI, choisir « MIDI To » �
 
 ## Compiler
 
-Le workflow GitHub Actions compile les 23 effets à chaque push sur `main` (ou à la main depuis l'onglet Actions). Résultat : un seul téléchargement **ANKS-FX-VST3-Windows** contenant tous les `.vst3`. Si un effet échoue, les autres sont quand même livrés.
+Le workflow GitHub Actions compile les 23 effets à chaque push sur `main` (ou à la main depuis l'onglet Actions). Quand les 23 effets compilent et que le numéro de version change dans `CMakeLists.txt` (`project(ANKS_FX VERSION …)`), un ZIP numéroté contenant tous les `.vst3` est publié dans **Releases**. Si un effet échoue, rien n'est publié (l'artefact de test reste disponible dans Actions).
 
 ## Installer
 
